@@ -20,9 +20,13 @@ const config = {
     name: '@storybook/server-webpack5',
     options: {
       quiet: true,
-      port: 6006
+      port: process.env.STORYBOOK_PORT
     }
   }
 };
+
+if (process.env.STORYBOOK_STATIC_PATH) {
+  config.staticDirs = [process.env.STORYBOOK_STATIC_PATH];
+}
 
 export default config;

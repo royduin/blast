@@ -19,6 +19,7 @@ class Publish extends Command
      */
     protected $signature = 'blast:publish
                                         {--install : Force install dependencies}
+                                        {--url= : set the server url used to load the stories}
                                         {--o|output-dir=storybook-static : Directory where to store built files}';
 
     /**
@@ -62,6 +63,7 @@ class Publish extends Command
      */
     public function handle()
     {
+        $serverUrl = $this->option('url', $this->storybookServer);
         $npmInstall = $this->option('install');
         $installMessage = $this->getInstallMessage($npmInstall);
         $outputDir = $this->option('output-dir');
@@ -116,7 +118,8 @@ class Publish extends Command
         }
 
         $this->runProcessInBlast($process, true, [
-            'STORYBOOK_SERVER_URL' => $this->storybookServer,
+            'STORYBOOK_SERVER_URL' => $serverUrl ?? $this->storybookServer,
+            'STORYBOOK_PORT' => $port ?? 6006,
             'STORYBOOK_STATUSES' => json_encode($this->storybookStatuses),
             'STORYBOOK_THEME' => json_encode($this->storybookTheme),
             'STORYBOOK_CUSTOM_THEME' => json_encode($this->customTheme),
@@ -131,6 +134,7 @@ class Publish extends Command
             'PROJECTPATH' => base_path(),
             'COMPONENTPATH' => base_path('resources/views/stories'),
             'STORYBOOK_SORT_ORDER' => json_encode($this->storybookSortOrder),
+            'STORYBOOK_VIEWPORTS' => false,
         ]);
 
         usleep(250000);
