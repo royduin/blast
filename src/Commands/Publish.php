@@ -7,10 +7,12 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use A17\Blast\Traits\Helpers;
+use A17\Blast\Traits\TailwindViewports;
 
 class Publish extends Command
 {
     use Helpers;
+    use TailwindViewports;
 
     /**
      * The name and signature of the console command.
@@ -54,6 +56,7 @@ class Publish extends Command
             'blast.storybook_global_types',
             [],
         );
+        $this->storybookViewports = config('blast.storybook_viewports', false);
     }
 
     /*
@@ -130,11 +133,13 @@ class Publish extends Command
             'STORYBOOK_GLOBAL_TYPES' => json_encode(
                 $this->storybookGlobalTypes,
             ),
+            'STORYBOOK_SORT_ORDER' => json_encode($this->storybookSortOrder),
+            'STORYBOOK_VIEWPORTS' => json_encode(
+                $this->buildTailwindViewports($this->storybookViewports),
+            ),
             'LIBSTORYPATH' => $this->vendorPath . '/stories',
             'PROJECTPATH' => base_path(),
             'COMPONENTPATH' => base_path('resources/views/stories'),
-            'STORYBOOK_SORT_ORDER' => json_encode($this->storybookSortOrder),
-            'STORYBOOK_VIEWPORTS' => false,
         ]);
 
         usleep(250000);

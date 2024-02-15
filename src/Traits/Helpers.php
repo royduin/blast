@@ -13,7 +13,7 @@ trait Helpers
     private function runProcessInBlast(
         array $command,
         $disableTimeout = false,
-        $envVars = null
+        $envVars = null,
     ) {
         $process = new Process($command, $this->vendorPath, $envVars);
         $process->setTty(Process::isTtySupported());
@@ -84,7 +84,7 @@ trait Helpers
             $this->runProcessInBlast([
                 'npm',
                 'ci',
-                '--production',
+                '--omit=dev',
                 '--ignore-scripts',
             ]);
         }
