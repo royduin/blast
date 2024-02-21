@@ -46,6 +46,7 @@ class Publish extends Command
 
         $this->filesystem = $filesystem;
         $this->storybookServer = config('blast.storybook_server_url');
+        $this->storybookServerAuth = config('blast.storybook_server_auth');
         $this->vendorPath = $this->getVendorPath();
         $this->storybookStatuses = config('blast.storybook_statuses');
         $this->storybookTheme = config('blast.storybook_theme', false);
@@ -125,6 +126,7 @@ class Publish extends Command
 
         $this->runProcessInBlast($process, true, [
             'STORYBOOK_SERVER_URL' => $serverUrl ?? $this->storybookServer,
+            'STORYBOOK_SERVER_AUTH' => $this->storybookServerAuth,
             'STORYBOOK_STATIC_PATH' => public_path(),
             'STORYBOOK_PORT' => 6006,
             'STORYBOOK_STATUSES' => json_encode($this->storybookStatuses),
