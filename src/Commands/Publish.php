@@ -168,7 +168,8 @@ class Publish extends Command
             $progressBar->advance();
 
             $chromaticProcess = [
-                'npx',
+                'npm',
+                'run',
                 'chromatic',
                 '--storybook-build-dir',
                 $destPath,
