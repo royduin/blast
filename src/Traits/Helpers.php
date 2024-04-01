@@ -96,11 +96,13 @@ trait Helpers
             : 'Reusing') . ' npm dependencies...';
     }
 
-    private function installDependencies($npmInstall, $storybookVersion)
+    private function installDependencies($npmInstall)
     {
-        $this->storybookInstallVersion = $storybookVersion;
+        $this->storybookInstallVersion = config('blast.storybook_version');
         $depsInstalled = $this->dependenciesInstalled();
-        $updateStorybook = $this->checkStorybookVersions($storybookVersion);
+        $updateStorybook = $this->checkStorybookVersions(
+            $this->storybookInstallVersion,
+        );
 
         if ($npmInstall || (!$npmInstall && !$depsInstalled)) {
             $this->runProcessInBlast(
@@ -110,10 +112,10 @@ trait Helpers
                 true,
             );
 
-            $this->installStorybook($storybookVersion);
+            $this->installStorybook($this->storybookInstallVersion);
         } else {
             if ($updateStorybook) {
-                $this->installStorybook($storybookVersion);
+                $this->installStorybook($this->storybookInstallVersion);
             }
         }
     }
@@ -158,16 +160,16 @@ trait Helpers
             usleep(250000);
         }
 
-        $this->info("Installing Storybook @ $storybookVersion");
+        $this->info("Installing Storybook @ $this->storybookInstallVersion");
 
         $deps = [
-            "@storybook/addon-a11y@$storybookVersion",
-            "@storybook/addon-actions@$storybookVersion",
-            "@storybook/addon-docs@$storybookVersion",
-            "@storybook/addon-essentials@$storybookVersion",
-            "@storybook/addon-links@$storybookVersion",
-            "storybook@$storybookVersion",
-            "@storybook/server-webpack5@$storybookVersion",
+            "@storybook/addon-a11y@$this->storybookInstallVersion",
+            "@storybook/addon-actions@$this->storybookInstallVersion",
+            "@storybook/addon-docs@$this->storybookInstallVersion",
+            "@storybook/addon-essentials@$this->storybookInstallVersion",
+            "@storybook/addon-links@$this->storybookInstallVersion",
+            "storybook@$this->storybookInstallVersion",
+            "@storybook/server-webpack5@$this->storybookInstallVersion",
         ];
 
         try {

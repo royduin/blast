@@ -45,7 +45,6 @@ class Launch extends Command
         parent::__construct();
 
         $this->filesystem = $filesystem;
-        $this->storybookVersion = config('blast.storybook_version');
         $this->storybookServer = config('blast.storybook_server_url');
         $this->vendorPath = $this->getVendorPath();
         $this->storybookStatuses = config('blast.storybook_statuses');
@@ -95,7 +94,7 @@ class Launch extends Command
         }
 
         // install deps
-        $this->installDependencies($npmInstall, $this->storybookVersion);
+        $this->installDependencies($npmInstall);
 
         usleep(250000);
 
@@ -152,6 +151,11 @@ class Launch extends Command
             'LIBSTORYPATH' => $this->vendorPath . '/stories',
             'PROJECTPATH' => base_path(),
             'COMPONENTPATH' => base_path('resources/views/stories'),
+            'STORYBOOK_CONFIG_PATH' => $this->filesystem->exists(
+                base_path('.storybook'),
+            )
+                ? base_path('.storybook')
+                : '.storybook',
         ]);
     }
 }
