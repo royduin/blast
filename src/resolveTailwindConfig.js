@@ -23,7 +23,10 @@ async function resolveTailwindConfig() {
   const { default: resolveConfig } = await import(
     'tailwindcss/resolveConfig.js'
   );
-  const { default: config } = await import(process.env.CONFIGPATH);
+
+  const { pathToFileURL } = await import('url');
+  const configPath = pathToFileURL(process.env.CONFIGPATH).href;
+  const { default: config } = await import(configPath);
 
   const fullConfig = resolveConfig(config);
 
