@@ -41,7 +41,7 @@ trait Helpers
             $process->enableOutput();
         }
 
-        $process->mustRun();
+        $process->run();
 
         if (!$disableOutput) {
             return $process->getOutput();
