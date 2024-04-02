@@ -2,9 +2,10 @@
 
 namespace A17\Blast\Commands;
 
+use Illuminate\Support\Str;
+use A17\Blast\Traits\Helpers;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
-use A17\Blast\Traits\Helpers;
 
 class PublishStorybookConfig extends Command
 {
@@ -90,24 +91,64 @@ class PublishStorybookConfig extends Command
             preg_match('/addons: [ \t]*\[(.*)\]/sU', $mainJsContents, $matches);
 
             if (filled($matches)) {
+                $toReplace = preg_split(
+                    '/(\s*,*\s*)*,+(\s*,*\s*)*/',
+                    trim($matches[1]),
+                );
+
+                $essentials = [
+                    'actions',
+                    'backgrounds',
+                    'controls',
+                    'docs',
+                    'highlight',
+                    'measure',
+                    'outline',
+                    'toolbars',
+                    'viewport',
+                ];
+
+                $replaceWith = [];
+
+                foreach ($toReplace as $item) {
+                    $prefix = '../vendor/area17/blast/node_modules/';
+                    $newPath = Str::of($item)
+                        ->between("'", "'")
+                        ->start($prefix);
+
+                    if (Str::contains($item, '@storybook/addon-essentials')) {
+                        $newEssentials = [];
+                        $newPath = $newPath->finish('/dist/');
+
+                        foreach ($essentials as $essential) {
+                            $newEssentials[] = $newPath
+                                ->finish($essential)
+                                ->start("'")
+                                ->finish("'")
+                                ->toString();
+                        }
+
+                        $replaceWith = array_merge(
+                            $replaceWith,
+                            $newEssentials,
+                        );
+                    } else {
+                        if (Str::contains($item, '@storybook/addon-links')) {
+                            $newPath = $newPath->finish('/dist');
+                        }
+
+                        $replaceWith[] = $newPath
+                            ->start("'")
+                            ->finish("'")
+                            ->toString();
+                    }
+                }
+
+                // dd($replaceWith);
+
                 $this->filesystem->replaceInFile(
                     $matches[1],
-                    "
-    '../vendor/area17/blast/node_modules/@storybook/addon-links/dist',
-    '../vendor/area17/blast/node_modules/@storybook/addon-essentials/dist/actions',
-    '../vendor/area17/blast/node_modules/@storybook/addon-essentials/dist/backgrounds',
-    '../vendor/area17/blast/node_modules/@storybook/addon-essentials/dist/controls',
-    '../vendor/area17/blast/node_modules/@storybook/addon-essentials/dist/docs',
-    '../vendor/area17/blast/node_modules/@storybook/addon-essentials/dist/highlight',
-    '../vendor/area17/blast/node_modules/@storybook/addon-essentials/dist/measure',
-    '../vendor/area17/blast/node_modules/@storybook/addon-essentials/dist/outline',
-    '../vendor/area17/blast/node_modules/@storybook/addon-essentials/dist/toolbars',
-    '../vendor/area17/blast/node_modules/@storybook/addon-essentials/dist/viewport',
-    '../vendor/area17/blast/node_modules/@storybook/addon-a11y',
-    '../vendor/area17/blast/node_modules/@storybook/addon-designs',
-    '../vendor/area17/blast/node_modules/storybook-source-code-addon',
-    '../vendor/area17/blast/node_modules/@etchteam/storybook-addon-status'
-  ",
+                    implode(",\n", $replaceWith),
                     $mainJsPath,
                 );
             }
