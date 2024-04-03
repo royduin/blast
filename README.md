@@ -541,6 +541,14 @@ You can pass the option `--force` to automatically overwrite existing documenati
 
 -   `--o, --output-dir` - the directory where to store built files relative to your `public` directory
 
+## Publish Storybook Config
+
+There may be times when you need to publish the storybook config files to your application directory (eg. changing Storybook versions). This copies the `.storybook` directory to your application root directory and updates the launch and publish tasks to use this directory for any Storybook configuration.
+
+```bash
+php artisan blast:publish-storybook-config
+```
+
 ## Troubleshooting
 
 If you see a `Failed to fetch` message when viewing your stories you will need to go to the path that Storybook is trying to load (open dev tools > network and right click the failed path and open in a new tab) and debug there. Any php errors or `dd` will trigger the `Failed to fetch` message.
