@@ -63,6 +63,12 @@ Blast uses the `public_path()` to reference any static assets. This means that a
 
 ### Options
 
+#### `storybook_version`
+
+Allows the use of a different version of Storybook. Blast has only been tested up to 7.1.1.
+
+Default: `'7.1.1'`
+
 #### `storybook_server_url`
 
 The route Storybook Server uses to render components. You shouldn't need to change this as it isn't ever visible on the FE.
@@ -536,6 +542,14 @@ You can pass the option `--force` to automatically overwrite existing documenati
 ### Options
 
 -   `--o, --output-dir` - the directory where to store built files relative to your `public` directory
+
+## Publish Storybook Config
+
+There may be times when you need to publish the storybook config files to your application directory (eg. changing Storybook versions). This copies the `.storybook` directory to your application root directory and updates the launch and publish tasks to use this directory for any Storybook configuration.
+
+```bash
+php artisan blast:publish-storybook-config
+```
 
 ## Troubleshooting
 

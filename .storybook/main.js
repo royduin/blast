@@ -18,8 +18,7 @@ const config = {
   framework: {
     name: '@storybook/server-webpack5',
     options: {
-      quiet: true,
-      port: process.env.STORYBOOK_PORT
+      quiet: true
     }
   }
 };

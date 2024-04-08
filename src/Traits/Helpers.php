@@ -7,6 +7,10 @@ use Illuminate\Support\Str;
 
 trait Helpers
 {
+    protected $storybookDefaultVersion = '7.1.1';
+
+    protected $storybookInstallVersion;
+
     /**
      * @return void
      */
@@ -14,9 +18,10 @@ trait Helpers
         array $command,
         $disableTimeout = false,
         $envVars = null,
+        $disableOutput = false,
+        $disableTty = false,
     ) {
         $process = new Process($command, $this->vendorPath, $envVars);
-        $process->setTty(Process::isTtySupported());
 
         if ($disableTimeout) {
             $process->setTimeout(null);
@@ -24,8 +29,23 @@ trait Helpers
             $process->setTimeout(config('blast.build_timeout', 300));
         }
 
-        $process->enableOutput();
-        $process->mustRun();
+        if ($disableTty) {
+            $process->setTty(false);
+        } else {
+            $process->setTty(Process::isTtySupported());
+        }
+
+        if ($disableOutput) {
+            $process->disableOutput();
+        } else {
+            $process->enableOutput();
+        }
+
+        $process->run();
+
+        if (!$disableOutput) {
+            return $process->getOutput();
+        }
     }
 
     /**
@@ -78,15 +98,127 @@ trait Helpers
 
     private function installDependencies($npmInstall)
     {
+        $this->storybookInstallVersion = config('blast.storybook_version');
         $depsInstalled = $this->dependenciesInstalled();
+        $updateStorybook = $this->checkStorybookVersions(
+            $this->storybookInstallVersion,
+        );
 
         if ($npmInstall || (!$npmInstall && !$depsInstalled)) {
-            $this->runProcessInBlast([
-                'npm',
-                'ci',
-                '--omit=dev',
-                '--ignore-scripts',
-            ]);
+            $this->runProcessInBlast(
+                ['npm', 'ci', '--omit=dev', '--ignore-scripts'],
+                false,
+                null,
+                true,
+            );
+
+            $this->installStorybook($this->storybookInstallVersion);
+        } else {
+            if ($updateStorybook) {
+                $this->installStorybook($this->storybookInstallVersion);
+            }
         }
+    }
+
+    private function installStorybook($storybookVersion)
+    {
+        if (!$storybookVersion) {
+            $this->error(
+                "No Storybook version defined. Using default version - $this->storybookDefaultVersion",
+            );
+
+            $this->storybookInstallVersion = $this->storybookDefaultVersion;
+        } else {
+            $this->storybookInstallVersion = $storybookVersion;
+        }
+
+        // check if version exists
+        $this->info("Verifying Storybook @ $this->storybookInstallVersion");
+
+        try {
+            $this->runProcessInBlast(
+                [
+                    'npm',
+                    'view',
+                    "storybook@$this->storybookInstallVersion",
+                    'version',
+                    '--json',
+                ],
+                false,
+                null,
+                true,
+            );
+
+            $this->info('Verified');
+        } catch (\Exception $e) {
+            $this->error(
+                "Problem verifying Storybook version. Using default version - $this->storybookDefaultVersion",
+            );
+
+            $this->storybookInstallVersion = $this->storybookDefaultVersion;
+
+            usleep(250000);
+        }
+
+        $this->info("Installing Storybook @ $this->storybookInstallVersion");
+
+        $deps = [
+            "@storybook/addon-a11y@$this->storybookInstallVersion",
+            "@storybook/addon-actions@$this->storybookInstallVersion",
+            "@storybook/addon-docs@$this->storybookInstallVersion",
+            "@storybook/addon-essentials@$this->storybookInstallVersion",
+            "@storybook/addon-links@$this->storybookInstallVersion",
+            "storybook@$this->storybookInstallVersion",
+            "@storybook/server-webpack5@$this->storybookInstallVersion",
+        ];
+
+        try {
+            $this->runProcessInBlast(
+                ['npm', 'install', ...$deps],
+                false,
+                null,
+                true,
+            );
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+
+            exit();
+        }
+    }
+
+    private function getInstalledStorybookVersion()
+    {
+        $version = false;
+        $rawOutput = $this->runProcessInBlast(
+            ['npm', 'list', 'storybook', '--json'],
+            false,
+            null,
+            false,
+            true,
+        );
+        $data = json_decode($rawOutput, true);
+
+        if (isset($data['dependencies']['storybook'])) {
+            $version = $data['dependencies']['storybook']['version'];
+        }
+
+        return $version;
+    }
+
+    private function checkStorybookVersions($storybookVersion)
+    {
+        // check if version matches installed version
+        $installedStorybookVersion = $this->getInstalledStorybookVersion();
+
+        if ($installedStorybookVersion !== $this->storybookInstallVersion) {
+            $this->newLine();
+            $this->info('Storybook version mismatch');
+            $this->info("Installed: $installedStorybookVersion");
+            $this->info("To Install: $this->storybookInstallVersion");
+
+            return true;
+        }
+
+        return false;
     }
 }

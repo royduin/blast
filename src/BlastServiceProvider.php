@@ -7,6 +7,7 @@ use A17\Blast\Commands\GenerateStories;
 use A17\Blast\Commands\GenerateUIDocs;
 use A17\Blast\Commands\Launch;
 use A17\Blast\Commands\Publish;
+use A17\Blast\Commands\PublishStorybookConfig;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
@@ -39,6 +40,7 @@ final class BlastServiceProvider extends ServiceProvider
                 GenerateUIDocs::class,
                 Launch::class,
                 Publish::class,
+                PublishStorybookConfig::class,
             ]);
         }
     }
@@ -63,7 +65,7 @@ final class BlastServiceProvider extends ServiceProvider
     private function bootBladeComponents(): void
     {
         $this->callAfterResolving(BladeCompiler::class, function (
-            BladeCompiler $blade
+            BladeCompiler $blade,
         ) {
             $prefix = config('blast.prefix', '');
 

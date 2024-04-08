@@ -121,7 +121,14 @@ class Publish extends Command
         if ($outputDir) {
             $process[] = '--';
 
-            $process = array_merge($process, ['-o', $outputDir]);
+            $process = array_merge($process, [
+                '-c',
+                $this->filesystem->exists(base_path('.storybook'))
+                    ? base_path('.storybook')
+                    : '.storybook',
+                '-o',
+                $outputDir,
+            ]);
         }
 
         $this->runProcessInBlast($process, true, [
