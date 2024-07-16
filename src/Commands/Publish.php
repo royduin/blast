@@ -11,6 +11,7 @@ use A17\Blast\Traits\TailwindViewports;
 
 class Publish extends Command
 {
+
     use Helpers;
     use TailwindViewports;
 
@@ -35,6 +36,56 @@ class Publish extends Command
      * @var Filesystem
      */
     protected $filesystem;
+
+    /**
+     * @var mixed
+     */
+    private $storybookViewports;
+
+    /**
+     * @var mixed
+     */
+    private $storybookGlobalTypes;
+
+    /**
+     * @var mixed
+     */
+    private $storybookSortOrder;
+
+    /**
+     * @var mixed
+     */
+    private $expandedControls;
+
+    /**
+     * @var mixed
+     */
+    private $docsTheme;
+
+    /**
+     * @var mixed
+     */
+    private $customTheme;
+
+    /**
+     * @var mixed
+     */
+    private $storybookTheme;
+
+    /**
+     * @var mixed
+     */
+    private $storybookStatuses;
+
+    /**
+     * @var string
+     */
+    private $vendorPath;
+
+    /**
+     * @var mixed
+     */
+    private $storybookServer;
 
     /**
      * @param Filesystem $filesystem

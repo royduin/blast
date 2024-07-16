@@ -38,6 +38,21 @@ class GenerateStories extends Command
     protected $dataStore;
 
     /**
+     * @var string
+     */
+    private $packageStoriesPath;
+
+    /**
+     * @var string
+     */
+    private $vendorPath;
+
+    /**
+     * @var string
+     */
+    private $storyViewsPath;
+
+    /**
      * @param Filesystem $filesystem
      */
     public function __construct(Filesystem $filesystem, DataStore $dataStore)

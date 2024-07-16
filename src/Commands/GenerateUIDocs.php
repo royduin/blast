@@ -33,6 +33,31 @@ class GenerateUIDocs extends Command
     protected $filesystem;
 
     /**
+     * @var string
+     */
+    private $parsedConfig;
+
+    /**
+     * @var mixed
+     */
+    private $configPath;
+
+    /**
+     * @var string
+     */
+    private $vendorPath;
+
+    /**
+     * @var mixed
+     */
+    private $storiesToGenerate;
+
+    /**
+     * @var array
+     */
+    private $config;
+
+    /**
      * @param Filesystem $filesystem
      */
     public function __construct(Filesystem $filesystem)

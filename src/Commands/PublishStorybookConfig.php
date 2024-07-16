@@ -31,6 +31,11 @@ class PublishStorybookConfig extends Command
     protected $filesystem;
 
     /**
+     * @var string
+     */
+    private $vendorPath;
+
+    /**
      * @param Filesystem $filesystem
      */
     public function __construct(Filesystem $filesystem)

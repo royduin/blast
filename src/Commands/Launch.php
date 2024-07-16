@@ -38,6 +38,56 @@ class Launch extends Command
     protected $filesystem;
 
     /**
+     * @var mixed
+     */
+   private $storybookViewports;
+
+    /**
+     * @var mixed
+     */
+   private $storybookSortOrder;
+
+    /**
+     * @var mixed
+     */
+   private $storybookGlobalTypes;
+
+    /**
+     * @var mixed
+     */
+   private $expandedControls;
+
+    /**
+     * @var mixed
+     */
+   private $docsTheme;
+
+    /**
+     * @var mixed
+     */
+   private $customTheme;
+
+    /**
+     * @var mixed
+     */
+   private $storybookTheme;
+
+    /**
+     * @var mixed
+     */
+   private $storybookStatuses;
+
+    /**
+     * @var string $vendorPath
+     */
+   private $vendorPath;
+
+    /**
+     * @var mixed
+     */
+   private $storybookServer;
+
+    /**
      * @param Filesystem $filesystem
      */
     public function __construct(Filesystem $filesystem)
